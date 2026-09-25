@@ -323,7 +323,6 @@ BEGIN
 END; 
 /
 
-
 CREATE OR REPLACE TRIGGER acompanhamentos_mensais_men_id_trg 
     BEFORE INSERT ON acompanhamentos_mensais 
     FOR EACH ROW 
@@ -411,14 +410,14 @@ END;
 -- 
 -- CREATE TABLE                            12
 -- CREATE INDEX                             0
--- ALTER TABLE                             22
+-- ALTER TABLE                             17
 -- CREATE VIEW                              0
 -- ALTER VIEW                               0
 -- CREATE PACKAGE                           0
 -- CREATE PACKAGE BODY                      0
 -- CREATE PROCEDURE                         0
 -- CREATE FUNCTION                          0
--- CREATE TRIGGER                           6
+-- CREATE TRIGGER                          11
 -- ALTER TRIGGER                            0
 -- CREATE COLLECTION TYPE                   0
 -- CREATE STRUCTURED TYPE                   0
@@ -431,7 +430,7 @@ END;
 -- CREATE DISK GROUP                        0
 -- CREATE ROLE                              0
 -- CREATE ROLLBACK SEGMENT                  0
--- CREATE SEQUENCE                          6
+-- CREATE SEQUENCE                          5
 -- CREATE MATERIALIZED VIEW                 0
 -- CREATE MATERIALIZED VIEW LOG             0
 -- CREATE SYNONYM                           0

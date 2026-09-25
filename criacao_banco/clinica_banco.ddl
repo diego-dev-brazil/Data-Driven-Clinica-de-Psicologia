@@ -5,16 +5,6 @@
 
 
 
-CREATE SEQUENCE acompanhamentos_aco_id_seq START WITH 1 NOCACHE ORDER;
-
-CREATE SEQUENCE acompanhamentos_mensais_men_id_seq START WITH 1 NOCACHE ORDER;
-
-CREATE SEQUENCE diagnosticos_diag_id_seq START WITH 1 NOCACHE ORDER;
-
-CREATE SEQUENCE modalidades_mod_id_seq START WITH 1 NOCACHE ORDER;
-
-CREATE SEQUENCE motivo_saidas_mot_id_seq START WITH 1 NOCACHE ORDER;
-
 CREATE TABLE acompanhamentos (
     aco_id             NUMBER NOT NULL,
     aco_nome_paciente  VARCHAR2(255) NOT NULL,
@@ -313,6 +303,16 @@ ALTER TABLE acompanhamentos_mensais
     ADD CONSTRAINT fk_men_aco FOREIGN KEY ( men_aco_id )
         REFERENCES acompanhamentos ( aco_id )
     NOT DEFERRABLE;
+
+CREATE SEQUENCE acompanhamentos_aco_id_seq START WITH 1 NOCACHE ORDER;
+
+CREATE SEQUENCE acompanhamentos_mensais_men_id_seq START WITH 1 NOCACHE ORDER;
+
+CREATE SEQUENCE diagnosticos_diag_id_seq START WITH 1 NOCACHE ORDER;
+
+CREATE SEQUENCE modalidades_mod_id_seq START WITH 1 NOCACHE ORDER;
+
+CREATE SEQUENCE motivo_saidas_mot_id_seq START WITH 1 NOCACHE ORDER;
 
 CREATE OR REPLACE TRIGGER acompanhamentos_aco_id_trg 
     BEFORE INSERT ON acompanhamentos 

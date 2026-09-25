@@ -51,9 +51,8 @@ ALTER TABLE acompanhamentos ADD CONSTRAINT pk_acompanhamento PRIMARY KEY ( aco_i
 CREATE TABLE acompanhamentos_diagnosticos (
     acod_diag_id  NUMBER NOT NULL,
     acod_aco_id   NUMBER NOT NULL
-    
 )
-LOGGING;
+
 
 ALTER TABLE acompanhamentos_diagnosticos ADD CONSTRAINT pk_acod PRIMARY KEY ( acod_diag_id,
                                                                               acod_aco_id );

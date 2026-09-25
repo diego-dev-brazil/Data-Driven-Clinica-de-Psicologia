@@ -38,15 +38,6 @@ acompanhamento do cliente';
 
 ALTER TABLE acompanhamentos ADD CONSTRAINT pk_acompanhamento PRIMARY KEY ( aco_id );
 
-CREATE TABLE acompanhamentos_diagnosticos (
-    acod_diag_id  NUMBER NOT NULL,
-    acod_aco_id   NUMBER NOT NULL
-)
-
-
-ALTER TABLE acompanhamentos_diagnosticos ADD CONSTRAINT pk_acod PRIMARY KEY ( acod_diag_id,
-                                                                              acod_aco_id );
-
 CREATE TABLE acompanhamentos_mensais (
     men_id            NUMBER NOT NULL,
     men_periodo       DATE NOT NULL,
@@ -98,6 +89,15 @@ COMMENT ON COLUMN diagnosticos.diag_nome IS
     'Nome do diagnostico';
 
 ALTER TABLE diagnosticos ADD CONSTRAINT pk_diagnostico PRIMARY KEY ( diag_id );
+
+CREATE TABLE acompanhamentos_diagnosticos (
+    acod_diag_id  NUMBER NOT NULL,
+    acod_aco_id   NUMBER NOT NULL
+)
+
+
+ALTER TABLE acompanhamentos_diagnosticos ADD CONSTRAINT pk_acod PRIMARY KEY ( acod_diag_id,
+                                                                              acod_aco_id );
 
 CREATE TABLE hacompanhamentos (
     haco_id             NUMBER NOT NULL,

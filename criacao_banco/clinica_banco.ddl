@@ -93,7 +93,7 @@ ALTER TABLE diagnosticos ADD CONSTRAINT pk_diagnostico PRIMARY KEY ( diag_id );
 CREATE TABLE acompanhamentos_diagnosticos (
     acod_diag_id  NUMBER NOT NULL,
     acod_aco_id   NUMBER NOT NULL
-)
+);
 
 
 ALTER TABLE acompanhamentos_diagnosticos ADD CONSTRAINT pk_acod PRIMARY KEY ( acod_diag_id,

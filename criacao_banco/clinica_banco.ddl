@@ -310,31 +310,6 @@ ALTER TABLE acompanhamentos_diagnosticos
         REFERENCES diagnosticos ( diag_id )
     NOT DEFERRABLE;
 
-ALTER TABLE hacompanhamentos
-    ADD CONSTRAINT fk_haco_hmod FOREIGN KEY ( haco_mod_id )
-        REFERENCES hmodalidades ( hmod_id )
-    NOT DEFERRABLE;
-
-ALTER TABLE hacompanhamentos
-    ADD CONSTRAINT fk_haco_hmot FOREIGN KEY ( haco_mot_id )
-        REFERENCES hmotivo_saidas ( hmot_id )
-    NOT DEFERRABLE;
-
-ALTER TABLE hacompanhamentos_diagnosticos
-    ADD CONSTRAINT fk_hacod_haco FOREIGN KEY ( hacod_aco_id )
-        REFERENCES hacompanhamentos ( haco_id )
-    NOT DEFERRABLE;
-
-ALTER TABLE hacompanhamentos_diagnosticos
-    ADD CONSTRAINT fk_hacod_hdiag FOREIGN KEY ( hacod_diag_id )
-        REFERENCES hdiagnosticos ( hdiag_id )
-    NOT DEFERRABLE;
-
-ALTER TABLE hacompanhamentos_mensais
-    ADD CONSTRAINT fk_hmen_aco FOREIGN KEY ( hmen_aco_id )
-        REFERENCES hacompanhamentos ( haco_id )
-    NOT DEFERRABLE;
-
 ALTER TABLE acompanhamentos_mensais
     ADD CONSTRAINT fk_men_aco FOREIGN KEY ( men_aco_id )
         REFERENCES acompanhamentos ( aco_id )
@@ -348,13 +323,6 @@ BEGIN
 END; 
 /
 
-CREATE OR REPLACE TRIGGER acompanhamentos_diagnosticos_acod_diag_id_trg 
-    BEFORE INSERT ON acompanhamentos_diagnosticos 
-    FOR EACH ROW 
-BEGIN
-    :new.acod_diag_id := acompanhamentos_diagnosticos_acod_diag_id_seq.nextval;
-END; 
-/
 
 CREATE OR REPLACE TRIGGER acompanhamentos_mensais_men_id_trg 
     BEFORE INSERT ON acompanhamentos_mensais 

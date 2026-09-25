@@ -7,8 +7,6 @@
 
 CREATE SEQUENCE acompanhamentos_aco_id_seq START WITH 1 NOCACHE ORDER;
 
-CREATE SEQUENCE acompanhamentos_diagnosticos_acod_diag_id_seq START WITH 1 NOCACHE ORDER;
-
 CREATE SEQUENCE acompanhamentos_mensais_men_id_seq START WITH 1 NOCACHE ORDER;
 
 CREATE SEQUENCE diagnosticos_diag_id_seq START WITH 1 NOCACHE ORDER;
@@ -37,7 +35,7 @@ COMMENT ON COLUMN acompanhamentos.aco_id IS
 entidade chamada acompanhamento do cliente';
 
 COMMENT ON COLUMN acompanhamentos.aco_status IS
-    'Situação do cliente
+    'SituaÃ§Ã£o do cliente
 no sistema: ativo ou inativo';
 
 COMMENT ON COLUMN acompanhamentos.aco_data_inicio IS
@@ -79,14 +77,14 @@ COMMENT ON COLUMN acompanhamentos_mensais.men_id IS
 da entidade acompanhamento mensal.';
 
 COMMENT ON COLUMN acompanhamentos_mensais.men_periodo IS
-    'Período
+    'PerÃ­odo
 que ocorreu o acompanhamento do paciente.';
 
 COMMENT ON COLUMN acompanhamentos_mensais.men_vezes_mes IS
-    'Quantidade de vezes no mês que o paciente foi consultado';
+    'Quantidade de vezes no mÃªs que o paciente foi consultado';
 
 COMMENT ON COLUMN acompanhamentos_mensais.men_vezes_falta IS
-    'Quantidade de vezes no mês que o paciente faltou nas consultas';
+    'Quantidade de vezes no mÃªs que o paciente faltou nas consultas';
 
 COMMENT ON COLUMN acompanhamentos_mensais.men_valor_mensal IS
     'Valor pago pelo paciente mensalmente';
@@ -133,7 +131,7 @@ COMMENT ON COLUMN hacompanhamentos.haco_id IS
 entidade chamada acompanhamento do cliente';
 
 COMMENT ON COLUMN hacompanhamentos.haco_status IS
-    'Situação do cliente
+    'SituaÃ§Ã£o do cliente
 no sistema: ativo ou inativo';
 
 COMMENT ON COLUMN hacompanhamentos.haco_data_inicio IS
@@ -176,14 +174,14 @@ COMMENT ON COLUMN hacompanhamentos_mensais.hmen_id IS
 da entidade acompanhamento mensal.';
 
 COMMENT ON COLUMN hacompanhamentos_mensais.hmen_periodo IS
-    'Período
+    'PerÃ­odo
 que ocorreu o acompanhamento do paciente.';
 
 COMMENT ON COLUMN hacompanhamentos_mensais.hmen_vezes_mes IS
-    'Quantidade de vezes no mês que o paciente foi consultado';
+    'Quantidade de vezes no mÃªs que o paciente foi consultado';
 
 COMMENT ON COLUMN hacompanhamentos_mensais.hmen_vezes_falta IS
-    'Quantidade de vezes no mês que o paciente faltou nas consultas';
+    'Quantidade de vezes no mÃªs que o paciente faltou nas consultas';
 
 COMMENT ON COLUMN hacompanhamentos_mensais.hmen_valor_mensal IS
     'Valor pago pelo paciente mensalmente';
@@ -247,7 +245,7 @@ COMMENT ON COLUMN hmotivo_saidas.hmot_id IS
 motivo saida';
 
 COMMENT ON COLUMN hmotivo_saidas.hmot_nome IS
-    'Motivo do porquê o
+    'Motivo do porquÃª o
 paciente parou de frequentar as consultas';
 
 ALTER TABLE hmotivo_saidas ADD CONSTRAINT pk_hmotivo_saidas PRIMARY KEY ( hmot_id, hmot_dt_entrada  );
@@ -287,7 +285,7 @@ COMMENT ON COLUMN motivo_saidas.mot_id IS
 motivo saida';
 
 COMMENT ON COLUMN motivo_saidas.mot_nome IS
-    'Motivo do porquê o
+    'Motivo do porquÃª o
 paciente parou de frequentar as consultas';
 
 ALTER TABLE motivo_saidas ADD CONSTRAINT pk_mot PRIMARY KEY ( mot_id );
@@ -441,7 +439,7 @@ END;
 /
 
 
--- Relat�rio do Resumo do Oracle SQL Developer Data Modeler: 
+-- Relatório do Resumo do Oracle SQL Developer Data Modeler: 
 -- 
 -- CREATE TABLE                            12
 -- CREATE INDEX                             0

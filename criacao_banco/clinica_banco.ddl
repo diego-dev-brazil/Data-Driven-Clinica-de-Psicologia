@@ -95,7 +95,6 @@ CREATE TABLE acompanhamentos_diagnosticos (
     acod_aco_id   NUMBER NOT NULL
 );
 
-
 ALTER TABLE acompanhamentos_diagnosticos ADD CONSTRAINT pk_acod PRIMARY KEY ( acod_diag_id,
                                                                               acod_aco_id );
 

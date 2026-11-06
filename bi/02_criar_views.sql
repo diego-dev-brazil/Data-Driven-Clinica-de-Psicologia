@@ -1,4 +1,5 @@
--- Executar conectado como APP, depois da criação das tabelas e das cargas.
+-- Executar conectado como BI
+, depois da criação das tabelas e das cargas.
 -- Oracle Database 12cR2
 --
 -- Estratégia para tabelas com histórico:

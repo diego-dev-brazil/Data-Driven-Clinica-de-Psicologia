@@ -1,0 +1,356 @@
+CREATE MATERIALIZED VIEW MV_DIAGNOSTICO_PERFIL AS
+
+WITH ASSOCIACOES AS (
+    SELECT
+        AD.ACOD_ACO_ID AS ID_ACOMPANHAMENTO,
+        AD.ACOD_DIAG_ID AS ID_DIAGNOSTICO,
+        CAST(NULL AS DATE) AS DATA_REFERENCIA
+    FROM APP.ACOMPANHAMENTOS_DIAGNOSTICOS AD
+
+    UNION ALL
+
+    SELECT
+        HAD.HACOD_ACO_ID,
+        HAD.HACOD_DIAG_ID,
+        HAD.HACOD_DT_ENTRADA
+    FROM APP.HACOMPANHAMENTOS_DIAGNOSTICOS HAD
+),
+
+ACOMPANHAMENTOS_VERSOES AS (
+    SELECT
+        A.ACO_ID,
+        A.ACO_STATUS,
+        A.ACO_DATA_INICIO,
+        A.ACO_DATA_FIM,
+        A.ACO_MOT_ID,
+        A.ACO_MOD_ID,
+        CAST(NULL AS DATE) AS DATA_REFERENCIA
+    FROM APP.ACOMPANHAMENTOS A
+
+    UNION ALL
+
+    SELECT
+        HA.HACO_ID,
+        HA.HACO_STATUS,
+        HA.HACO_DATA_INICIO,
+        HA.HACO_DATA_FIM,
+        HA.HACO_MOT_ID,
+        HA.HACO_MOD_ID,
+        HA.HACO_DT_ENTRADA
+    FROM APP.HACOMPANHAMENTOS HA
+),
+
+DIAGNOSTICOS_VERSOES AS (
+    SELECT
+        D.DIAG_ID,
+        D.DIAG_NOME,
+        CAST(NULL AS DATE) AS DATA_REFERENCIA
+    FROM APP.DIAGNOSTICOS D
+
+    UNION ALL
+
+    SELECT
+        HD.HDIAG_ID,
+        HD.HDIAG_NOME,
+        HD.HDIAG_DT_ENTRADA
+    FROM APP.HDIAGNOSTICOS HD
+),
+
+MODALIDADES_VERSOES AS (
+    SELECT
+        M.MOD_ID,
+        M.MOD_NOME,
+        CAST(NULL AS DATE) AS DATA_REFERENCIA
+    FROM APP.MODALIDADES M
+
+    UNION ALL
+
+    SELECT
+        HM.HMOD_ID,
+        HM.HMOD_NOME,
+        HM.HMOD_DT_ENTRADA
+    FROM APP.HMODALIDADES HM
+),
+
+MOTIVOS_VERSOES AS (
+    SELECT
+        MS.MOT_ID,
+        MS.MOT_NOME,
+        CAST(NULL AS DATE) AS DATA_REFERENCIA
+    FROM APP.MOTIVO_SAIDAS MS
+
+    UNION ALL
+
+    SELECT
+        HMS.HMOT_ID,
+        HMS.HMOT_NOME,
+        HMS.HMOT_DT_ENTRADA
+    FROM APP.HMOTIVO_SAIDAS HMS
+),
+
+ACOMPANHAMENTOS_CANDIDATOS AS (
+    SELECT
+        AD.ID_ACOMPANHAMENTO,
+        AD.ID_DIAGNOSTICO,
+        AD.DATA_REFERENCIA AS DATA_REF_ASSOCIACAO,
+
+        A.ACO_STATUS,
+        A.ACO_DATA_INICIO,
+        A.ACO_DATA_FIM,
+        A.ACO_MOT_ID,
+        A.ACO_MOD_ID,
+        A.DATA_REFERENCIA AS DATA_REF_ACOMPANHAMENTO,
+
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                AD.ID_ACOMPANHAMENTO,
+                AD.ID_DIAGNOSTICO,
+                AD.DATA_REFERENCIA
+            ORDER BY
+                CASE
+                    WHEN A.DATA_REFERENCIA IS NULL THEN 1
+                    ELSE 0
+                END,
+                A.DATA_REFERENCIA
+        ) AS RN
+
+    FROM ASSOCIACOES AD
+
+    LEFT JOIN ACOMPANHAMENTOS_VERSOES A
+        ON A.ACO_ID = AD.ID_ACOMPANHAMENTO
+        AND (
+            (
+                AD.DATA_REFERENCIA IS NULL
+                AND A.DATA_REFERENCIA IS NULL
+            )
+            OR
+            (
+                AD.DATA_REFERENCIA IS NOT NULL
+                AND (
+                    A.DATA_REFERENCIA >= AD.DATA_REFERENCIA
+                    OR A.DATA_REFERENCIA IS NULL
+                )
+            )
+        )
+),
+
+ACOMPANHAMENTOS_ESCOLHIDOS AS (
+    SELECT *
+    FROM ACOMPANHAMENTOS_CANDIDATOS
+    WHERE RN = 1
+),
+
+DIAGNOSTICOS_CANDIDATOS AS (
+    SELECT
+        AD.ID_ACOMPANHAMENTO,
+        AD.ID_DIAGNOSTICO,
+        AD.DATA_REFERENCIA AS DATA_REF_ASSOCIACAO,
+
+        D.DIAG_NOME,
+
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                AD.ID_ACOMPANHAMENTO,
+                AD.ID_DIAGNOSTICO,
+                AD.DATA_REFERENCIA
+            ORDER BY
+                CASE
+                    WHEN D.DATA_REFERENCIA IS NULL THEN 1
+                    ELSE 0
+                END,
+                D.DATA_REFERENCIA
+        ) AS RN
+
+    FROM ASSOCIACOES AD
+
+    LEFT JOIN DIAGNOSTICOS_VERSOES D
+        ON D.DIAG_ID = AD.ID_DIAGNOSTICO
+        AND (
+            (
+                AD.DATA_REFERENCIA IS NULL
+                AND D.DATA_REFERENCIA IS NULL
+            )
+            OR
+            (
+                AD.DATA_REFERENCIA IS NOT NULL
+                AND (
+                    D.DATA_REFERENCIA >= AD.DATA_REFERENCIA
+                    OR D.DATA_REFERENCIA IS NULL
+                )
+            )
+        )
+),
+
+DIAGNOSTICOS_ESCOLHIDOS AS (
+    SELECT *
+    FROM DIAGNOSTICOS_CANDIDATOS
+    WHERE RN = 1
+),
+
+BASE AS (
+    SELECT
+        A.ID_ACOMPANHAMENTO,
+        A.ID_DIAGNOSTICO,
+        A.DATA_REF_ASSOCIACAO,
+
+        A.ACO_STATUS,
+        A.ACO_DATA_INICIO,
+        A.ACO_DATA_FIM,
+        A.ACO_MOT_ID,
+        A.ACO_MOD_ID,
+        A.DATA_REF_ACOMPANHAMENTO,
+
+        D.DIAG_NOME
+
+    FROM ACOMPANHAMENTOS_ESCOLHIDOS A
+
+    LEFT JOIN DIAGNOSTICOS_ESCOLHIDOS D
+        ON D.ID_ACOMPANHAMENTO = A.ID_ACOMPANHAMENTO
+        AND D.ID_DIAGNOSTICO = A.ID_DIAGNOSTICO
+        AND (
+            D.DATA_REF_ASSOCIACAO = A.DATA_REF_ASSOCIACAO
+            OR (
+                D.DATA_REF_ASSOCIACAO IS NULL
+                AND A.DATA_REF_ASSOCIACAO IS NULL
+            )
+        )
+),
+
+MODALIDADES_CANDIDATAS AS (
+    SELECT
+        B.*,
+        M.MOD_NOME,
+
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                B.ID_ACOMPANHAMENTO,
+                B.ID_DIAGNOSTICO,
+                B.DATA_REF_ASSOCIACAO,
+                B.DATA_REF_ACOMPANHAMENTO
+            ORDER BY
+                CASE
+                    WHEN M.DATA_REFERENCIA IS NULL THEN 1
+                    ELSE 0
+                END,
+                M.DATA_REFERENCIA
+        ) AS RN_MODALIDADE
+
+    FROM BASE B
+
+    LEFT JOIN MODALIDADES_VERSOES M
+        ON M.MOD_ID = B.ACO_MOD_ID
+        AND (
+            (
+                B.DATA_REF_ACOMPANHAMENTO IS NULL
+                AND M.DATA_REFERENCIA IS NULL
+            )
+            OR
+            (
+                B.DATA_REF_ACOMPANHAMENTO IS NOT NULL
+                AND (
+                    M.DATA_REFERENCIA >= B.DATA_REF_ACOMPANHAMENTO
+                    OR M.DATA_REFERENCIA IS NULL
+                )
+            )
+        )
+),
+
+MODALIDADES_ESCOLHIDAS AS (
+    SELECT *
+    FROM MODALIDADES_CANDIDATAS
+    WHERE RN_MODALIDADE = 1
+),
+
+MOTIVOS_CANDIDATOS AS (
+    SELECT
+        B.*,
+        MS.MOT_NOME,
+
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                B.ID_ACOMPANHAMENTO,
+                B.ID_DIAGNOSTICO,
+                B.DATA_REF_ASSOCIACAO,
+                B.DATA_REF_ACOMPANHAMENTO
+            ORDER BY
+                CASE
+                    WHEN MS.DATA_REFERENCIA IS NULL THEN 1
+                    ELSE 0
+                END,
+                MS.DATA_REFERENCIA
+        ) AS RN_MOTIVO
+
+    FROM MODALIDADES_ESCOLHIDAS B
+
+    LEFT JOIN MOTIVOS_VERSOES MS
+        ON MS.MOT_ID = B.ACO_MOT_ID
+        AND (
+            (
+                B.DATA_REF_ACOMPANHAMENTO IS NULL
+                AND MS.DATA_REFERENCIA IS NULL
+            )
+            OR
+            (
+                B.DATA_REF_ACOMPANHAMENTO IS NOT NULL
+                AND (
+                    MS.DATA_REFERENCIA >= B.DATA_REF_ACOMPANHAMENTO
+                    OR MS.DATA_REFERENCIA IS NULL
+                )
+            )
+        )
+)
+
+SELECT
+    ID_ACOMPANHAMENTO,
+
+    ID_DIAGNOSTICO,
+    DIAG_NOME AS DIAGNOSTICO,
+
+    ACO_STATUS AS STATUS_ACOMPANHAMENTO,
+
+    ACO_DATA_INICIO AS DATA_INICIO,
+    ACO_DATA_FIM AS DATA_ENCERRAMENTO,
+
+    EXTRACT(YEAR FROM ACO_DATA_INICIO) AS ANO_INICIO,
+    EXTRACT(MONTH FROM ACO_DATA_INICIO) AS MES_INICIO,
+
+    EXTRACT(YEAR FROM ACO_DATA_FIM) AS ANO_ENCERRAMENTO,
+    EXTRACT(MONTH FROM ACO_DATA_FIM) AS MES_ENCERRAMENTO,
+
+    CASE
+        WHEN ACO_DATA_INICIO IS NOT NULL THEN
+            TRUNC(NVL(ACO_DATA_FIM, SYSDATE))
+            - TRUNC(ACO_DATA_INICIO)
+    END AS DIAS_ACOMPANHAMENTO,
+
+    CASE
+        WHEN ACO_DATA_INICIO IS NULL THEN 'SEM DATA DE INICIO'
+        WHEN TRUNC(NVL(ACO_DATA_FIM, SYSDATE))
+             - TRUNC(ACO_DATA_INICIO) < 30
+            THEN 'ATE 1 MES'
+        WHEN TRUNC(NVL(ACO_DATA_FIM, SYSDATE))
+             - TRUNC(ACO_DATA_INICIO) < 90
+            THEN 'DE 1 A 3 MESES'
+        WHEN TRUNC(NVL(ACO_DATA_FIM, SYSDATE))
+             - TRUNC(ACO_DATA_INICIO) < 180
+            THEN 'DE 3 A 6 MESES'
+        WHEN TRUNC(NVL(ACO_DATA_FIM, SYSDATE))
+             - TRUNC(ACO_DATA_INICIO) < 365
+            THEN 'DE 6 A 12 MESES'
+        ELSE 'ACIMA DE 12 MESES'
+    END AS FAIXA_DURACAO,
+
+    ACO_MOD_ID AS ID_MODALIDADE,
+    MOD_NOME AS MODALIDADE,
+
+    ACO_MOT_ID AS ID_MOTIVO_SAIDA,
+    MOT_NOME AS MOTIVO_SAIDA,
+
+    CASE
+        WHEN ACO_DATA_FIM IS NULL
+            THEN 'SEM DATA DE ENCERRAMENTO'
+        ELSE 'COM DATA DE ENCERRAMENTO'
+    END AS SITUACAO_ENCERRAMENTO
+
+FROM MOTIVOS_CANDIDATOS
+WHERE RN_MOTIVO = 1;
